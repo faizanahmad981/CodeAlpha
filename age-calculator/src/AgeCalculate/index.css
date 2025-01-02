@@ -1,6 +1,7 @@
 body {
     font-family: "Poppins", sans-serif;
-    background: linear-gradient(135deg, #43cea2, #185a9d);
+    background: linear-gradient(135deg, #000000, #131212);
+    /* background: linear-gradient(135deg, #43cea2, #185a9d); */
     color: white;
     display: flex;
     align-items: center;
@@ -23,7 +24,7 @@ body {
   
   h1 {
     font-size: 2.5rem;
-    color: #185a9d;
+    color: #060606;
   }
   
   h2 {
@@ -72,7 +73,7 @@ body {
   .circleStyle {
     flex: 1;
     padding: 10px;
-    border: 2px solid #185a9d;
+    border: 2px solid #191a1a;
     border-radius: 10px;
     font-size: 1.2rem;
     text-align: center;

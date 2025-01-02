@@ -13,7 +13,7 @@ const AgeCalculate = () => {
   const [age, setAge] = useState(null);
   const [error, setError] = useState("");
 
-  // Set current date on component mount
+  
   useEffect(() => {
     const today = new Date();
     setCurrentDate({
