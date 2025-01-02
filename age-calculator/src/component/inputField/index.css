@@ -1,0 +1,25 @@
+.custom-input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #185a9d;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s ease;
+    width: 20rem !important;
+  }
+  
+  .custom-input:focus {
+    border-color: #43cea2;
+    box-shadow: 0 0 5px rgba(67, 206, 162, 0.5);
+  }
+  @media screen and (max-width: 480px){
+    .custom-input {
+     width: 100px !important;
+     align-items: center !important;
+     justify-content: center !important;
+   
+    }
+  }
+
+  
