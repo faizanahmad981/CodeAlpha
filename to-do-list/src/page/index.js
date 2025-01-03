@@ -1,33 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./index.css";
+import CustomInput from "../components/input";
+import TaskTable from "../components/table";
 
 const ToDoList = () => {
-  const [tasks, setTasks] = useState([]);
-  const [completedTasks, setCompletedTasks] = useState([]);
+  const [tasks, setTasks] = useState(
+    JSON.parse(localStorage.getItem("tasks")) || []
+  );
+  const [completedTasks, setCompletedTasks] = useState(
+    JSON.parse(localStorage.getItem("completedTasks")) || []
+  );
   const [task, setTask] = useState("");
   const [priority, setPriority] = useState("top");
   const [deadline, setDeadline] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
+  const [editingTaskId, setEditingTaskId] = useState(null);
 
-  const handleTaskChange = (e) => {
-    setTask(e.target.value);
-  };
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    localStorage.setItem("completedTasks", JSON.stringify(completedTasks));
+  }, [tasks, completedTasks]);
 
-  const handlePriorityChange = (e) => {
-    setPriority(e.target.value);
-  };
-
-  const handleDeadlineChange = (e) => {
-    setDeadline(e.target.value);
-  };
-  const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
-  };
+  const handleTaskChange = (e) => setTask(e.target.value);
+  const handlePriorityChange = (e) => setPriority(e.target.value);
+  const handleDeadlineChange = (e) => setDeadline(e.target.value);
+  const handleDescriptionChange = (e) => setDescription(e.target.value);
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) setImage(URL.createObjectURL(file));
   };
+
   const addTask = () => {
     if (!task.trim() || !deadline || !description || !image) {
       alert("Please fill out all fields and upload an image.");
@@ -43,7 +46,7 @@ const ToDoList = () => {
     }
 
     const newTask = {
-      id: tasks.length + 1,
+      id: editingTaskId || tasks.length + 1,
       task,
       priority,
       deadline,
@@ -51,7 +54,17 @@ const ToDoList = () => {
       image,
     };
 
-    setTasks([...tasks, newTask]);
+    if (editingTaskId) {
+      setTasks(tasks.map((t) => (t.id === editingTaskId ? newTask : t)));
+      setEditingTaskId(null);
+    } else {
+      setTasks([...tasks, newTask]);
+    }
+
+    clearFields();
+  };
+
+  const clearFields = () => {
     setTask("");
     setPriority("top");
     setDeadline("");
@@ -60,43 +73,53 @@ const ToDoList = () => {
   };
 
   const markDone = (id) => {
-    const updatedTasks = tasks.map((t) =>
-      t.id === id ? { ...t, done: true } : t
-    );
-    setTasks(updatedTasks);
-
-    const completedTask = tasks.find((t) => t.id === id);
-    if (completedTask) {
-      setCompletedTasks([...completedTasks, completedTask]);
+    const taskToComplete = tasks.find((t) => t.id === id);
+    if (taskToComplete) {
+      setCompletedTasks([...completedTasks, taskToComplete]);
+      setTasks(tasks.filter((t) => t.id !== id));
     }
   };
 
-  const upcomingTasks = tasks.filter((t) => !t.done);
+  const deleteTask = (id, completed = false) => {
+    if (completed) {
+      setCompletedTasks(completedTasks.filter((t) => t.id !== id));
+    } else {
+      setTasks(tasks.filter((t) => t.id !== id));
+    }
+  };
+
+  const editTask = (id) => {
+    const taskToEdit = tasks.find((t) => t.id === id);
+    if (taskToEdit) {
+      setTask(taskToEdit.task);
+      setPriority(taskToEdit.priority);
+      setDeadline(taskToEdit.deadline);
+      setDescription(taskToEdit.description);
+      setImage(taskToEdit.image);
+      setEditingTaskId(taskToEdit.id);
+    }
+  };
 
   return (
     <div className="App">
       <header>
-        <h1> TO DO List </h1>
+        <h1>To-Do List</h1>
       </header>
       <main>
         <div className="task-form">
-          <input
+          <CustomInput
             type="text"
             id="task"
-            placeholder="Enter task..."
+            placeholder="Enter task ..."
             value={task}
             onChange={handleTaskChange}
           />
-          <select
-            id="priority"
-            value={priority}
-            onChange={handlePriorityChange}
-          >
+          <select id="priority" value={priority} onChange={handlePriorityChange}>
             <option value="top">Top Priority</option>
             <option value="middle">Middle Priority</option>
             <option value="low">Less Priority</option>
           </select>
-          <input
+          <CustomInput
             type="date"
             id="deadline"
             value={deadline}
@@ -105,81 +128,46 @@ const ToDoList = () => {
         </div>
         <div className="row">
           <textarea
-          className="TextArea"
+            className="TextArea"
             placeholder="Description"
             value={description}
             onChange={handleDescriptionChange}
           ></textarea>
-          <input type="file" className="imageUpload" accept="image/*" onChange={handleImageUpload} />
+          <CustomInput
+            type="file"
+            className="imageUpload"
+            accept="image/*"
+            onChange={handleImageUpload}
+          />
         </div>
-        <button id="add-task" onClick={addTask}>
-          Add Task
+        <button id="add-task" className="add-task" onClick={addTask}>
+          {editingTaskId ? "Update Task" : "Add Task"}
         </button>
-        <h2 className="heading">Upcoming Tasks</h2>
-        <div className="task-list" id="task-list">
-          <table>
-            <thead>
-              <tr>
-                <th>Task Name</th>
-                <th>Priority</th>
-                <th>Deadline</th>
-                <th>Description</th>
-                <th>Image</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {upcomingTasks.map((t) => (
-                <tr key={t.id}>
-                  <td>{t.task}</td>
-                  <td>{t.priority}</td>
-                  <td>{t.deadline}</td>
-                  <td>{t.description}</td>
-                  <td>
-                    <img src={t.image} alt="Task" style={{ width: "100px" }} />
-                  </td>
-                  <td>
-                    {!t.done && (
-                      <button
-                        className="mark-done"
-                        onClick={() => markDone(t.id)}
-                      >
-                        Mark Done
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="completed-task-list">
+
+        {/* Task Lists */}
+        <section>
+          <h2 className="heading">Upcoming Tasks</h2>
+          <div id="task-list">
+            <TaskTable
+              tasks={tasks}
+              showAction={true}
+              markDone={markDone}
+              editTask={editTask}
+              deleteTask={deleteTask}
+            />
+          </div>
+        </section>
+
+        <section>
           <h2 className="cheading">Completed Tasks</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Task Name</th>
-                <th>Priority</th>
-                <th>Deadline</th>
-                <th>Description</th>
-                <th>Image</th>
-              </tr>
-            </thead>
-            <tbody>
-              {completedTasks.map((ct) => (
-                <tr key={ct.id}>
-                  <td>{ct.task}</td>
-                  <td>{ct.priority}</td>
-                  <td>{ct.deadline}</td>
-                  <td>{ct.description}</td>
-                  <td>
-                    <img src={ct.image} alt="Task" style={{ width: "100px" }} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          <div className="completed-task-list">
+            <TaskTable
+              tasks={completedTasks}
+              showAction={false}
+              deleteTask={(id) => deleteTask(id, true)}
+            />
+          </div>
+        </section>
       </main>
     </div>
   );

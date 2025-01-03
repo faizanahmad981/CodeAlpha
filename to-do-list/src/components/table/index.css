@@ -1,0 +1,71 @@
+.mark-done {
+    padding: 10px;
+    font-size: 16px;
+    flex: 1;
+    border-radius: 15px;
+    background-color: rgb(28, 235, 9);
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#icons{
+  
+    border: none !important;
+    margin-top: 0.5rem !important;
+    padding: 10px;
+    font-size: 16px;
+    flex: 1;
+    border-radius: 15px;
+    background-color: crimson;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+.task-list {
+    border: 1px solid #ddd;
+    padding: 10px;
+   
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    color: black;
+}
+
+table th,
+table td {
+    padding: 19px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    
+}
+.table-header{
+    background-color: #eee;
+    color: black;
+    border-radius: 10px;
+   
+}
+
+.completed-task-list {
+    margin-top: 20px;
+}
+
+.completed-task {
+    padding: 10px;
+    border: 1px solid crimson;
+    border-radius: 5px;
+    background-color: #eaffea;
+}
+
+
+.completed-task h2 {
+    color: rgb(4, 199, 243);
+}
+
+h2 {
+    font-size: 1.3rem;
+}
